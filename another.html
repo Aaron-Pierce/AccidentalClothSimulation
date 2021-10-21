@@ -289,26 +289,93 @@
         let frameCount = 0;
         if (canvas instanceof HTMLCanvasElement) {
             let ctx = canvas.getContext('2d');
+
+            class Rectangle {
+                constructor(x, y, w, h, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.w = w;
+                    this.h = h;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.color = color;
+                }
+            }
+
+            let rectangles = [new Rectangle(Math.random() * width, Math.random() * height, 50 + 250 * Math.random(), 50 + 250 * Math.random(), [255 * Math.random(), 255 * Math.random(), 255 * Math.random()])];
+            
+            function nudgeColor(color){
+                let r = color[0] + 50 * (Math.random()-0.5);
+                let g = color[1] + 50 * (Math.random()-0.5);
+                let b = color[2] + 50 * (Math.random()-0.5);
+
+                return [Math.min(255, Math.max(0, r)), Math.min(255, Math.max(0, g)), Math.min(255, Math.max(0, b))]
+            }
+
             function animate() {
                 ctx.clearRect(0, 0, width, height);
-                const dx = 50;
-                const dy = 50;
-                for (let i = width/6; i < 5 * width / 6; i += dx) {
-                    for (let j = height/6; j < 5 * height / 6; j += dy) {
-                        ctx.save();
-                        ctx.fillStyle = `rgb(${150 + (255 - 150) * (i / width)}, ${20 + 100 * (i / width) + 100 * (j / height)}, ${75 + (250 - 75) * j / height})`;
-                        ctx.beginPath();
-                        ctx.ellipse(
-                            i + 1000 * noise.noise3D(i / width, j / height, frameCount/60),
-                            j + 1000 * noise.noise3D(i / width, j / height, frameCount/60),
-                            dx * Math.abs(1 + noise.noise2D(i / width + frameCount / 60, j / height)),
-                            dy * Math.abs(1 + noise.noise2D(i / width + frameCount / 60, j / height)),
-                            0, 0, 7);
-                        ctx.stroke();
-                        ctx.fill();
-                        ctx.restore();
+
+                function splitRectangle(rect) {
+                    let area = rect.width * rect.height;
+                    if (area < 25) return;
+                    if (Math.random() < 0.5) {
+                        rectangles.push(new Rectangle(
+                            rect.x + rect.w / 2,
+                            rect.y,
+                            rect.w / 2,
+                            rect.h,
+                            nudgeColor()
+                        ));
+                        rect.w /= 2;
+                    } else {
+                        rectangles.push(new Rectangle(
+                            rect.x,
+                            rect.y + rect.h / 2,
+                            rect.w,
+                            rect.h / 2,
+                            [rect.color[0] + 25 * (Math.random() - 0.5), rect.color[1] + 25 * (Math.random() - 0.5), rect.color[2] + 25 * (Math.random() - 0.5)]
+                        ));
+                        rect.h /= 2;
+                    }
+
+
+                }
+
+                for (let r of rectangles) {
+                    ctx.save();
+                    ctx.fillStyle = `rgb(${r.color[0]}, ${r.color[1]}, ${r.color[2]})`;
+                    ctx.fillRect(r.x, r.y, r.w, r.h);
+                    ctx.strokeRect(r.x, r.y, r.w, r.h);
+                    ctx.restore();
+
+                    r.vx += noise.noise2D(r.x / width, r.y / height);
+                    r.vy += noise.noise2D(r.x / width, r.y / height);
+                    r.x += r.vx;
+                    r.y += r.vy;
+
+                    if (Math.abs(r.vx) > 2) r.vx = 2 * Math.sign(r.vx);
+                    if (Math.abs(r.vy) > 2) r.vy = 2 * Math.sign(r.vy);
+
+                    if (r.x < 0) r.x = width;
+                    if (r.x > width) r.x = 0;
+                    if (r.y > height) r.y = 0;
+                    if (r.y < 0) r.y = height;
+
+                    if (Math.random() < 0.01 / rectangles.length) {
+                        splitRectangle(r);
                     }
                 }
+
+
+                function newRect() {
+                    rectangles.push(new Rectangle(Math.random() * width, Math.random() * height, 50 + 250 * Math.random(), 50 + 250 * Math.random(), [255 * Math.random(), 255 * Math.random(), 255 * Math.random()]));
+                }
+                if (Math.random() < 0.01) {
+                    newRect();
+                }
+
+
+
 
                 frameCount++;
                 requestAnimationFrame(animate);
