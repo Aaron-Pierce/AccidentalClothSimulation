@@ -287,29 +287,73 @@
         let width = canvas.width;
         let height = canvas.height;
         let frameCount = 0;
+
+
+        function lerpColor(c1, c2, pct) {
+            return [
+                c1[0] + (c2[0] - c1[0]) * pct,
+                c1[1] + (c2[1] - c1[1]) * pct,
+                c1[2] + (c2[2] - c1[2]) * pct,
+            ]
+        }
+
+        function ensureColor(...colors){
+            console.log("ensuring", colors);
+            for(let c of colors){
+                for(let prop of c){
+                    prop = prop % 256;
+                    while(prop < 0){
+                        prop += 255;
+                    }
+                }
+            }
+        }
+
         if (canvas instanceof HTMLCanvasElement) {
             let ctx = canvas.getContext('2d');
 
+            let c1 = [255 * Math.random(), 255 * Math.random(), 255 * Math.random()];
+            let c2 = [255 * Math.random(), 255 * Math.random(), 255 * Math.random()];
+
+            let rootColor = [25 + 200 * Math.random(), 25 + 200 * Math.random(), 25 + 200 * Math.random()];
+
+            let randDist = 50 + 100 * Math.random();
+            c1 = [rootColor[0] + randDist, rootColor[1] + randDist, rootColor[2] + randDist];
+            c2 = [rootColor[0] - randDist, rootColor[1] - randDist, rootColor[2] - randDist];
+            ensureColor(c1, c2);
+
+
+            // let rd1 = 25 + 200 * Math.random();
+            // let rd2 = 25 + 200 * Math.random();
+            // c1 = [rootColor[0] + rd1, rootColor[1] - rd1, rootColor[2] + rd1];
+            // c2 = [rootColor[0] - rd2, rootColor[1] + rd2, rootColor[2] - rd2];
+            // ensureColor(c1, c2);
+
+
+            console.log(c1, c2);
+            // c2 = [200, 200, 200];
+
             function animate() {
-                // console.time("frame");
+                console.time("frame");
                 ctx.clearRect(0, 0, width, height);
 
-                let dy = 100;
-                for (let j = height / 6; j <= 5 * height / 6; j += dy) {
-                    let dx = 25;
-                    for (let i = width / 6; i <= 5 * width / 6; i += dx) {
-                        let rootPos = [i, j + dy / 2 * Math.sin(i / (dx * 2 * 3.14))]
+                let dx = 50;
+                let dy = 50;
+
+                for (let i = width / 6; i <= 5 * width / 6; i += dx) {
+                    for (let j = height / 6; j <= 5 * height / 6; j += dy) {
+                        let pct = (noise.noise2D(3 * i / width + frameCount / 90, 3 * j / height + frameCount / 90) + 1) / 2;
+                        let color = lerpColor(c1, c2, pct);
+                        ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]})`;
                         ctx.beginPath();
-                        ctx.ellipse(
-                            rootPos[0] + 350 * noise.noise2D(10 * rootPos[0] / width + frameCount / 60, rootPos[1] / height),
-                            rootPos[1] + 350 * noise.noise2D(10 * rootPos[0] / width, rootPos[1] / height),
-                            20, 20, 0, 0, 7);
+                        ctx.ellipse(i, j, dx * (2*(pct + 0.2)), dy * (2 * (pct + 0.2)), 0, 0, 7);
+                        // ctx.stroke();
                         ctx.fill();
                     }
                 }
 
                 frameCount++;
-                // console.timeEnd("frame");
+                console.timeEnd("frame");
                 requestAnimationFrame(animate);
             }
             requestAnimationFrame(animate);
