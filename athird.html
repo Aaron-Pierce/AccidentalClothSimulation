@@ -301,8 +301,8 @@
                         let rootPos = [i, j + dy / 2 * Math.sin(i / (dx * 2 * 3.14))]
                         ctx.beginPath();
                         ctx.ellipse(
-                            rootPos[0] + 250 * noise.noise2D(10 * rootPos[0] / width + frameCount / 60, rootPos[1] / height),
-                            rootPos[1] + 250 * noise.noise2D(10 * rootPos[0] / width, rootPos[1] / height),
+                            rootPos[0] + 350 * noise.noise2D(10 * rootPos[0] / width + frameCount / 60, rootPos[1] / height),
+                            rootPos[1] + 350 * noise.noise2D(10 * rootPos[0] / width, rootPos[1] / height),
                             20, 20, 0, 0, 7);
                         ctx.fill();
                     }
