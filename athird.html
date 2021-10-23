@@ -292,7 +292,14 @@
 
             function animate() {
                 // console.time("frame");
-                ctx.clearRect(0, 0, width, height);
+                // ctx.clearRect(0, 0, width, height);
+                ctx.save();
+                ctx.fillStyle = `rgba(255, 255, 255, 0.005)`;
+                // ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+
+                // ctx.fillStyle = `rgba(${255/2 * (noise.noise2D(frameCount/600, frameCount/300) + 1)}, ${255/2 * (noise.noise2D(frameCount/200, frameCount/100) + 1)}, ${255/2 * (noise.noise2D(frameCount/1600, frameCount/1000) + 1)})`;
 
                 let dy = 100;
                 for (let j = height / 6; j <= 5 * height / 6; j += dy) {
@@ -302,7 +309,8 @@
                         ctx.beginPath();
                         ctx.ellipse(
                             rootPos[0] + 350 * noise.noise2D(10 * rootPos[0] / width + frameCount / 60, rootPos[1] / height),
-                            rootPos[1] + 350 * noise.noise2D(10 * rootPos[0] / width, rootPos[1] / height),
+                            rootPos[1] + 350 * noise.noise2D(10 * rootPos[0] / width + frameCount / 60, rootPos[1] / height),
+                            // rootPos[1] + 350 * noise.noise2D(10 * rootPos[0] / width, rootPos[1] / height),
                             20, 20, 0, 0, 7);
                         ctx.fill();
                     }

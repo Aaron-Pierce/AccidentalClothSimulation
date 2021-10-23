@@ -323,14 +323,14 @@
             ensureColor(c1, c2);
 
 
-            // let rd1 = 25 + 200 * Math.random();
-            // let rd2 = 25 + 200 * Math.random();
-            // c1 = [rootColor[0] + rd1, rootColor[1] - rd1, rootColor[2] + rd1];
-            // c2 = [rootColor[0] - rd2, rootColor[1] + rd2, rootColor[2] - rd2];
-            // ensureColor(c1, c2);
+            let rd1 = 25 + 125 * Math.random();
+            let rd2 = 25 + 125 * Math.random();
+            c1 = [rootColor[0] + rd1, rootColor[1] + rd1, rootColor[2] + rd1];
+            c2 = [rootColor[0] - rd2, rootColor[1] - rd2, rootColor[2] - rd2];
+            ensureColor(c1, c2);
 
 
-            console.log(c1, c2);
+            // console.log(c1, c2);
             // c2 = [200, 200, 200];
 
             function animate() {
@@ -346,7 +346,10 @@
                         let color = lerpColor(c1, c2, pct);
                         ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]})`;
                         ctx.beginPath();
-                        ctx.ellipse(i, j, dx * (2*(pct + 0.2)), dy * (2 * (pct + 0.2)), 0, 0, 7);
+                        ctx.ellipse(
+                            i, 
+                            j, 
+                            dx * (2*(pct + 0.2)), dy * (2 * (pct + 0.2)), 0, 0, 7);
                         // ctx.stroke();
                         ctx.fill();
                     }
